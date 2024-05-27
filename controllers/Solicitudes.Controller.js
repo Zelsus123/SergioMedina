@@ -2,10 +2,10 @@ const { Solicitudes } = require("../Database/db");
 const fs = require('fs')
 const hbs = require('handlebars')
 const path = require('path');
-const { default: puppeteer } = require("puppeteer");
+const puppeteer = require("puppeteer")
 const SolicitudesController = {};
 const nodemailer = require('nodemailer');
-const pdf = require('html-pdf');
+
 
 
 const email = nodemailer.createTransport({
