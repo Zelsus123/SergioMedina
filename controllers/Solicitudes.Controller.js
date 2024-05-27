@@ -61,11 +61,11 @@ SolicitudesController.createSolicitud = async (req, res) => {
 
     let templatePath = ""
     if(solicitud.tipo === "constancia de estudio"){
-      templatePath = path.join(__dirname, '../templates/ConstanciaEstudios.hbs');
+      templatePath = path.join(__dirname, '../Templates/ConstanciaEstudios.hbs');
         } else if(solicitud.tipo === "acta de compromiso") {
-          templatePath = path.join(__dirname, '../templates/ActaCompromiso.hbs');      
+          templatePath = path.join(__dirname, '../Templates/ActaCompromiso.hbs');      
     } else {
-      templatePath = path.join(__dirname, '../templates/CulminacionEstudios.hbs');
+      templatePath = path.join(__dirname, '../Templates/CulminacionEstudios.hbs');
     }
     const templateContent = fs.readFileSync(templatePath, 'utf8');
       const template = hbs.compile(templateContent);
