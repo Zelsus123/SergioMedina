@@ -89,7 +89,7 @@ SolicitudesController.createSolicitud = async (req, res) => {
         '--single-process', // <- this one doesn't works in Windows
         '--disable-gpu'
       ],
-      executablePath: process.env.CHROME_BIN || null, // Para Render.com
+      executablePath: '/usr/bin/chromium-browser',
       userDataDir: path.join(__dirname, '../puppeteer_cache') // Ruta de caché configurada
     });
     const page = await browser.newPage();
