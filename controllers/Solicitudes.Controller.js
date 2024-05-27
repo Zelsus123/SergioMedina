@@ -58,17 +58,19 @@ SolicitudesController.createSolicitud = async (req, res) => {
     };
 
     // Cargar la plantilla HTML
+
     let templatePath = ""
-    if (solicitud.tipo === "constancia de estudio") {
+    if(solicitud.tipo === "constancia de estudio"){
       templatePath = path.join(__dirname, '../Templates/ConstanciaEstudios.hbs');
-    } else if (solicitud.tipo === "acta de compromiso") {
-      templatePath = path.join(__dirname, '../Templates/ActaCompromiso.hbs');      
+        } else if(solicitud.tipo === "acta de compromiso") {
+          templatePath = path.join(__dirname, '../Templates/ActaCompromiso.hbs');      
     } else {
       templatePath = path.join(__dirname, '../Templates/CulminacionEstudios.hbs');
     }
     const templateContent = fs.readFileSync(templatePath, 'utf8');
-    const template = hbs.compile(templateContent);
-    console.log("Plantilla cargada con los datos");
+      const template = hbs.compile(templateContent);
+      console.log("Plantilla cargada con los datos");
+  
 
     // Renderizar la plantilla con los datos de la solicitud
     const html = template({ data });
@@ -76,7 +78,19 @@ SolicitudesController.createSolicitud = async (req, res) => {
 
     // Configurar Puppeteer para generar el PDF
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: true,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process', // <- this one doesn't works in Windows
+        '--disable-gpu'
+      ],
+      executablePath: process.env.CHROME_BIN || null, // Para Render.com
+      userDataDir: path.join(__dirname, '../puppeteer_cache') // Ruta de caché configurada
     });
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
@@ -89,6 +103,7 @@ SolicitudesController.createSolicitud = async (req, res) => {
 
     await browser.close();
     console.log("PDF Generado");
+
 
 
     // Configuración del correo electrónico
