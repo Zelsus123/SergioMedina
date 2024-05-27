@@ -58,67 +58,68 @@ SolicitudesController.createSolicitud = async (req, res) => {
     };
 
     // Cargar la plantilla HTML
-
     let templatePath = ""
-    if(solicitud.tipo === "constancia de estudio"){
+    if (solicitud.tipo === "constancia de estudio") {
       templatePath = path.join(__dirname, '../Templates/ConstanciaEstudios.hbs');
-        } else if(solicitud.tipo === "acta de compromiso") {
-          templatePath = path.join(__dirname, '../Templates/ActaCompromiso.hbs');      
+    } else if (solicitud.tipo === "acta de compromiso") {
+      templatePath = path.join(__dirname, '../Templates/ActaCompromiso.hbs');      
     } else {
       templatePath = path.join(__dirname, '../Templates/CulminacionEstudios.hbs');
     }
     const templateContent = fs.readFileSync(templatePath, 'utf8');
-      const template = hbs.compile(templateContent);
-      console.log("Plantilla cargada con los datos");
-  
+    const template = hbs.compile(templateContent);
+    console.log("Plantilla cargada con los datos");
 
     // Renderizar la plantilla con los datos de la solicitud
     const html = template({ data });
     console.log("Plantilla Renderizada con los datos");
 
-    // Configurar las opciones para generar el PDF
-    const options = {
+    // Configurar Puppeteer para generar el PDF
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+
+    // Generar el PDF
+    const pdfBuffer = await page.pdf({
       format: 'A4',
-      orientation: 'portrait', // 'landscape' para apaisado
-    };
-
-    // Generar el PDF desde el HTML
-    pdf.create(html, options).toStream((err, stream) => {
-      if (err) {
-        console.error("Error:", err);
-        res.status(500).json({ message: "Error al generar el PDF" });
-        return;
-      }
-      
-      //Configuracion correo
-      const mailOptions = {
-        from: "jesusbag123@gmail.com",
-        to: solicitud.correo,
-        subject: `Solicitud de ${solicitud.tipo} procesada`,
-        html: '<img src="https://bashify.io/img/28f064ff8b192ed5a9cfa26292589b06">',
-        attachments: [{
-          filename: 'solicitud.pdf',
-          content: stream,
-        }]
-      };
-
-      email.sendMail(mailOptions, (error, info)=>{
-        if (error){
-          console.error(error)
-          res.status(500).json({message: "Error al enviar el correo electronico"});
-          return;
-        }
-        console.log("Coreo electronico enviado: ", info.response);
-        res.json({Message: "Correo electronico enviado con exito"})
-      })
+      printBackground: true
     });
 
+    await browser.close();
+    console.log("PDF Generado");
+
+
+    // Configuración del correo electrónico
+    const mailOptions = {
+      from: 'jesusbag123@gmail.com', // Reemplaza con tu correo de Gmail
+      to: solicitud.correo,
+      subject: `Solicitud de ${solicitud.tipo} procesada`,
+      html: '<img src="https://bashify.io/img/28f064ff8b192ed5a9cfa26292589b06"/>', // Usar "cid" para referenciar la imagen embebida
+      attachments: [
+        {
+          filename: 'solicitud.pdf',
+          content: pdfBuffer,
+        },
+      ],
+    };
+
+    // Enviar el correo electrónico
+    email.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error al enviar el correo electrónico" });
+        return;
+      }
+      console.log("Correo electrónico enviado:", info.response);
+      res.json({ message: "Correo electrónico enviado con éxito" });
+    });
   } catch (error) {
     console.error("Error:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
-
 
 SolicitudesController.getSolicitudById = async (req, res) => {
   try {
