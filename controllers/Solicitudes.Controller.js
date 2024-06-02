@@ -13,8 +13,8 @@ const email = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth:{
-    user: "jesusbag123@gmail.com",
-    pass: 'asuj xqae uqjd korl'
+    user: "gruposergiomedina@gmail.com",
+    pass: 'vcor lohm qbka pydp'
   }
 })
 
@@ -108,7 +108,7 @@ SolicitudesController.createSolicitud = async (req, res) => {
 
     // Configuración del correo electrónico
     const mailOptions = {
-      from: 'jesusbag123@gmail.com', // Reemplaza con tu correo de Gmail
+      from: 'gruposergiomedina@gmail.com', // Reemplaza con tu correo de Gmail
       to: solicitud.correo,
       subject: `Solicitud de ${solicitud.tipo} procesada`,
       html: '<img src="https://bashify.io/img/28f064ff8b192ed5a9cfa26292589b06"/>', // Usar "cid" para referenciar la imagen embebida
