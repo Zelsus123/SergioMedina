@@ -8,7 +8,7 @@ const Database = {
   password: process.env.DB_PASSWORD || "wcZISxUkAB",
   database: process.env.DB_DATABASE || "sql10709750",
   host: process.env.DB_HOST || "sql10.freesqldatabase.com",
-  dialect: process.env.DB_DIALECT || "mysql",
+  dialect:  "mysql",
 };
 
 module.exports = {
