@@ -24,28 +24,29 @@ SolicitudesController.getSolicitudes = async (req, res) => {
   try {
     const solicitudes = await Solicitudes.findAll({
     });
-    res.json(solicitudes);
+    return solicitudes
   } catch (error) {
-    res.json({ message: error.message });
+    throw new Error(error)
   }
 };
 
-SolicitudesController.createSolicitud = async (req, res) => {
+SolicitudesController.createSolicitud = async (solicitudData) => {
   try {
     // Guardar la solicitud en la base de datos
     const solicitud = await Solicitudes.create({
-      estudiante: req.body.estudiante,
-      curso: req.body.curso,
-      seccion: req.body.seccion,
-      turno: req.body.turno,
-      periodo: req.body.periodo,
-      fecha: Date.now(),
-      tipo: req.body.tipo,
-      representante: req.body.representante,
-      nacido: req.body.nacido,
-      edad: req.body.edad,
-      cedula: req.body.cedula,
-      correo: req.body.correo,
+      estudiante: solicitudData.estudiante,
+      curso: solicitudData.curso,
+      seccion: solicitudData.seccion,
+      turno: solicitudData.turno,
+      periodo: solicitudData.periodo,
+      fecha: solicitudData.fecha,
+      tipo: solicitudData.tipo,
+      representante: solicitudData.representante,
+      nacido: solicitudData.nacido,
+      edad: solicitudData.edad,
+      cedula: solicitudData.cedula,
+      correo: solicitudData.correo,
+      proceso: false
     });
 
     // Descomponer la fecha en componentes
@@ -111,12 +112,12 @@ SolicitudesController.createSolicitud = async (req, res) => {
       from: 'gruposergiomedina@gmail.com', // Reemplaza con tu correo de Gmail
       to: solicitud.correo,
       subject: `Solicitud de ${solicitud.tipo} procesada`,
-      html: '<img src="https://bashify.io/img/28f064ff8b192ed5a9cfa26292589b06"/>', // Usar "cid" para referenciar la imagen embebida
+      html: '<a href="https://ibb.co/pWPxyB3"><img src="https://i.ibb.co/hXMyfJK/Carta-Sergio-Medina-page-0001.jpg" alt="Carta-Sergio-Medina-page-0001" border="0"></a>', // Usar "cid" para referenciar la imagen embebida
       attachments: [
         {
           filename: 'solicitud.pdf',
           content: pdfBuffer,
-        },
+        }
       ],
     };
 
@@ -128,11 +129,10 @@ SolicitudesController.createSolicitud = async (req, res) => {
         return;
       }
       console.log("Correo electrónico enviado:", info.response);
-      res.json({ message: "Correo electrónico enviado con éxito" });
+      return solicitud
     });
   } catch (error) {
-    console.error("Error:", error.message);
-    res.status(500).json({ message: error.message });
+    throw new Error("Error al crear solicitud", error)
   }
 };
 

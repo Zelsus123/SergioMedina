@@ -1,0 +1,13 @@
+html {
+    background-color: #eee;
+    overflow: scroll;
+    ;
+}
+body{
+    margin: 0;
+    background-color: inherit;
+}
+
+::-webkit-scrollbar{
+    display:none;
+}

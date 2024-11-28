@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     nacido: DataTypes.STRING,
     edad: DataTypes.STRING,
     cedula: DataTypes.STRING,
+    proceso: DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'solicitudes',

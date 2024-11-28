@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     fecha: DataTypes.DATE,
     contenido: DataTypes.TEXT,
     imagen: DataTypes.STRING,
-    autor: DataTypes.INTEGER
+    autor: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'novedades',

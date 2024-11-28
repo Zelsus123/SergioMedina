@@ -5,24 +5,24 @@ NovedadesController.getNovedades = async (req, res) => {
   try {
     const novedades = await Novedades.findAll({
     });
-    res.json(novedades);
+    return novedades
   } catch (error) {
-    res.json({ message: error.message });
+    console.error("error al obtener noticias", error)
   }
 };
 
-NovedadesController.createNovedad = async (req, res) => {
+NovedadesController.createNovedad = async (novedad) => {
   try {
-    await Novedades.create({
-        titulo: req.body.titulo,
-        fecha: Date.now(),
-        contenido: req.body.contenido,
-        imagen: req.body.imagen,
-        autor: req.body.autor
+   const nuevaNovedad = await Novedades.create({
+        titulo: novedad.titulo,
+        fecha: novedad.fecha,
+        contenido: novedad.contenido,
+        imagen: novedad.imagen ? novedad.imagen : "https://cdn.pixabay.com/photo/2024/03/27/15/19/ai-generated-8659303_1280.jpg",
+        autor: novedad.autor
     });
-    res.json("Registro creado exitosamente");
+    return nuevaNovedad
   } catch (error) {
-    res.json({ message: error.message });
+    console.error(error)
   }
 };
 
@@ -37,23 +37,57 @@ NovedadesController.getNovedadById = async (req, res) => {
   }
 };
 
-NovedadesController.deleteNovedad = async (req, res) => {
+NovedadesController.deleteNovedad = async (id) => {
   try {
-    await Novedades.destroy({
-      where: { id: req.params.id },
-    });
-    res.json("Se ha eliminado el registro");
+      // Intenta eliminar el usuario con el ID proporcionado
+      const result = await Novedades.destroy({
+          where: { id },
+      });
+      
+      // Verifica si se eliminó algún registro
+      if (result === 0) {
+          throw new Error(`No se encontró novedad con ID ${id}`);
+      }
+      
+      console.log("Se ha eliminado el registro con ID: " + id);
+      return { message: "Usuario eliminado exitosamente." }; // Devuelve un mensaje de éxito
   } catch (error) {
-    res.json({ message: error.message });
+      console.error("Error al eliminar el usuario:", error);
+      throw new Error("No se puede eliminar el usuario: " + error.message); // Proporciona un mensaje de error más específico
   }
 };
 
-NovedadesController.updateNovedad = async (req, res) => {
+NovedadesController.updateNovedad = async (novedadData) => {
   try {
-    await Novedades.update(req.body, { where: { id: req.params.id } });
-    res.json("Registro modificado exitosamente");
+    // Busca la novedad por ID
+    console.log(novedadData)
+    const novedad = await Novedades.findByPk(novedadData.id);
+
+    // Si la novedad no existe, lanza un error
+    if (!novedad) {
+      throw new Error("Novedad no encontrada");
+    }
+
+    // Extrae los campos del objeto novedadData
+    const { titulo, contenido, imagen } = novedadData;
+
+    // Actualiza los campos solo si se proporcionan
+    if (titulo !== undefined) {
+      novedad.titulo = titulo;
+    }
+    if (contenido !== undefined) {
+      novedad.contenido = contenido;
+    }
+    if (imagen !== undefined) {
+      novedad.imagen = imagen;
+    }
+
+    // Guarda la novedad actualizada en la base de datos
+    await novedad.save();
+
+    return { novedad }; // Retorna la novedad actualizada
   } catch (error) {
-    res.json({ message: error.message });
+    throw new Error("Error al actualizar la novedad: " + error.message);
   }
 };
 
